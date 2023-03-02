@@ -1,0 +1,21 @@
+baseURL = 'https://lifemeetscode.com/'
+languageCode = 'en-us'
+title = 'Life Meets Code'
+theme = 'gokarna'
+[params]
+  avatarURL = "/images/hacker.png"
+  avatarSize = "size-l"
+  description = "Making excuses to tinker with technology."
+  socialIcons = [
+      {name = "mastodon", url = "https://activity.kammeyer.xyz/@adam"},
+      {name = "github", url = "https://github.com/adamkammeyer"},
+      {name = "linkedin", url = "https://www.linkedin.com/in/adamkammeyer"},
+      {name = "rss", url = "/index.xml"},
+    ]
+  footer = "Adam Kammeyer"
+[menu]
+
+  [[menu.main]]
+    identifier = "posts"
+    name       = "Posts"
+    url        = "/posts"

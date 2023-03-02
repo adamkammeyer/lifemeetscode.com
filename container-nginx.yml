@@ -1,0 +1,67 @@
+- hosts: all
+  remote_user: ansible
+  become: yes
+  become_method: sudo
+  vars:
+    docker_user: "dockremap"
+    docker_user_uid: 231072
+    docker_user_gid: 231072
+  tasks:
+    - name: Create config directory for nginx
+      file:
+        path: /opt/appdata/lifemeetscode
+        state: directory
+        owner: "{{ (docker_user_uid+1000)|int|abs }}"
+        group: "{{ (docker_user_gid+1000)|int|abs }}"
+        mode: "0755"
+      tags: 
+        - install
+
+    - name: Create nginx container
+      docker_container:
+        name: lmc
+        image: lscr.io/linuxserver/nginx
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          TZ: "America/Chicago"
+        volumes:
+          - /opt/appdata/lifemeetscode:/config
+        restart_policy: unless-stopped
+        purge_networks: yes
+        networks_cli_compatible: yes
+        ports:
+          - 8088:80
+          # - 8443:443
+        networks:
+          - name: "external"
+          - name: "internal"
+      tags: 
+        - install
+
+    - name: upload application files
+      copy:
+        src: "./public/"
+        dest: /opt/appdata/lifemeetscode/www/
+        owner: "{{ (docker_user_uid+1000)|int|abs }}"
+        group: "{{ (docker_user_gid+1000)|int|abs }}"
+        mode: "0644"
+        directory_mode: "0755"
+      tags: 
+        - app
+
+    
+    - name: Remove nginx container
+      docker_container:
+        name: lmc
+        state: absent
+      tags:
+        - remove
+        - purge
+    
+    - name: Remove nginx config directory
+      file:
+        path: /opt/appdata/lifemeetscode
+        state: absent
+      tags:
+        - purge
